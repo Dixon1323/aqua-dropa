@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create User</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYdTBac2rRJBem9ntcha-RKROmIlj8nVQ&libraries=places"></script>
+    <script>
+        function initAutocomplete() {
+            var input = document.getElementById('autocomplete');
+            var autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.setFields(['address_components', 'geometry', 'icon', 'name']);
+            autocomplete.addListener('place_changed', function() {
+                var place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    window.alert("No details available for input: '" + place.name + "'");
+                    return;
+                }
+                document.getElementById('location').value = place.geometry.location.lat() + ', ' + place.geometry.location.lng();
+            });
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    var latlng = new google.maps.LatLng(lat, lng);
+                    var geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({'location': latlng}, function(results, status) {
+                        if (status === 'OK') {
+                            if (results[0]) {
+                                document.getElementById('autocomplete').value = results[0].formatted_address;
+                                document.getElementById('location').value = lat + ', ' + lng;
+                            } else {
+                                window.alert('No results found');
+                            }
+                        } else {
+                            window.alert('Geocoder failed due to: ' + status);
+                        }
+                    });
+                }, function() {
+                    alert("Geolocation failed");
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    </script>
+</head>
+<body onload="initAutocomplete()">
+    <a href="{{ url_for('index') }}">Home</a>
+    <h1>Create User</h1>
+    <form action="/admin/create_user" method="POST">
+        Name: <input type="text" name="name" required><br>
+        Email: <input type="email" name="email" required><br>
+        Phone: <input type="text" name="phone" required><br>
+        Address: <input type="text" name="address" required><br>
+        Location: <input type="text" id="autocomplete" placeholder="Enter location manually" required><br>
+        <input type="hidden" id="location" name="location">
+        <button type="button" onclick="getCurrentLocation()">Use Current Location</button><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

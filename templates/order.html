@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Place Order</title>
+</head>
+<body>
+    <a href="{{ url_for('index') }}">Home</a>
+    <h1>Place Order</h1>
+    <form action="" method="POST">
+        <input type="hidden" name="user_id" value="{{ user_id }}">
+        Password: <input type="password" name="password" required><br>
+        Product Type:
+        <select name="product_type" required>
+            <option value="20L can">20L Can</option>
+            <option value="bottles">Bottles</option>
+        </select><br>
+        Quantity: <input type="number" name="quantity" required><br>
+        <input type="submit" value="Place Order">
+    </form>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</body>
+</html>

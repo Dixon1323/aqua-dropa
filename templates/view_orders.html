@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Orders</title>
+</head>
+<body>
+    <a href="{{ url_for('index') }}">Home</a>
+    <h1>View Orders</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>User Name</th>
+            <th>Quantity</th>
+            <th>Product Type</th>
+            <th>Timestamp</th>
+            <th>Status</th>
+            <th>Assigned Delivery Boy</th>
+            <th>Actions</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.user.name }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>{{ order.product_type }}</td>
+            <td>{{ order.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ order.status }}</td>
+            <td>
+                {% if order.delivery_agent %}
+                    {{ order.delivery_agent.name }}
+                {% else %}
+                    <form action="{{ url_for('assign_delivery_agent', order_id=order.id) }}" method="POST">
+                        <select name="delivery_agent_id">
+                            <option value="">Select Delivery Agent</option>
+                            {% for agent in delivery_agents %}
+                                <option value="{{ agent.id }}">{{ agent.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit">Assign</button>
+                    </form>
+                {% endif %}
+            </td>
+            <td>
+                {% if order.status != 'Delivered' %}
+                    <form action="{{ url_for('mark_delivered', id=order.id) }}" method="POST" style="display:inline;">
+                        <button type="submit">Mark as Delivered</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

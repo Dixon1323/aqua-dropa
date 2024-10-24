@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Users</title>
+</head>
+<body>
+    <a href="{{ url_for('index') }}">Home</a>
+    <h1>View Users</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Location</th>
+            <th>QR Code</th>
+            <th>Password</th>
+            <th>Actions</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phone }}</td>
+            <td>{{ user.address }}</td>
+            <td>
+                {% if user.location %}
+                    <a href="https://www.google.com/maps?q={{ user.location }}" target="_blank">{{ user.location }}</a>
+                {% else %}
+                    Location not available
+                {% endif %}
+            </td>
+            <td>
+                {% if user.qr_code %}
+                    <img src="{{ url_for('static', filename=user.qr_code) }}" alt="QR Code" width="100">
+                {% else %}
+                    No QR Code
+                {% endif %}
+            </td>
+            <td>{{ user.name.lower() }}{{ user.id }}</td>
+            <td>
+                <form action="{{ url_for('regenerate_qr_code', user_id=user.id) }}" method="POST" style="display:inline;">
+                    <button type="submit">Regenerate QR Code</button>
+                </form>
+                <form action="{{ url_for('download_qr_code', user_id=user.id) }}" method="GET" style="display:inline;">
+                    <button type="submit">Download QR Code</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Delivery Agents</title>
+    <script>
+        function confirmDeletion(agentName) {
+            if (confirm('Are you sure you want to delete ' + agentName + '?')) {
+                document.getElementById('delete_agent_name').value = agentName;
+                document.getElementById('delete_form').submit();
+            }
+        }
+    </script>
+</head>
+<body>
+    <a href="{{ url_for('index') }}">Home</a>
+    <h1>View Delivery Agents</h1>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Actions</th>
+        </tr>
+        {% for agent in delivery_agents %}
+        <tr>
+            <td>{{ agent.name }}</td>
+            <td>{{ agent.phone }}</td>
+            <td>{{ agent.email }}</td>
+            <td>{{ agent.address }}</td>
+            <td>
+                <a href="{{ url_for('reset_password', user_id=agent.id) }}">Reset Password</a>
+                <button type="button" onclick="confirmDeletion('{{ agent.name }}')">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Hidden form for deletion -->
+    <form id="delete_form" action="/admin/delete_delivery_agent" method="POST" style="display:none;">
+        <input type="hidden" id="delete_agent_name" name="name">
+    </form>
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+</body>
+</html>

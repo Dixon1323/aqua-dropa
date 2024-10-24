@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Agent Dashboard</title>
+</head>
+<body>
+    <h1>Assigned Orders</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>User Name</th>
+            <th>Product Type</th>
+            <th>Quantity</th>
+            <th>Timestamp</th>
+            <th>Actions</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.user.name }}</td>
+            <td>{{ order.product_type }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>{{ order.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>
+                <form action="{{ url_for('delivery_agent_mark_delivered', id=order.id) }}" method="POST" style="display:inline;">
+                    <button type="submit">Mark as Delivered</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <form action="{{ url_for('logout_agent') }}" method="post">
+        <button type="submit">Logout</button>
+    </form>    
+</body>
+</html>

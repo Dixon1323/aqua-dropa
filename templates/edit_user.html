@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit User</title>
+    <script>
+        function fetchUserDetails(userId) {
+            if (!userId) {
+                return;
+            }
+            fetch(`/admin/get_user/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                    } else {
+                        document.getElementById('user_id').value = data.id;
+                        document.getElementById('name').value = data.name;
+                        document.getElementById('email').value = data.email;
+                        document.getElementById('phone').value = data.phone;
+                        document.getElementById('address').value = data.address;
+                        document.getElementById('location').value = data.location || '';
+                        // Set the hidden field for deletion
+                        document.getElementById('delete_user_name').value = data.name;
+                    }
+                });
+        }
+
+        function confirmDeletion() {
+            return confirm('Are you sure you want to delete this user?');
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    document.getElementById('location').value = `${position.coords.latitude}, ${position.coords.longitude}`;
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+    </script>
+</head>
+<body>
+    <a href="{{ url_for('index') }}">Home</a>
+    <h1>Edit User</h1>
+    <select onchange="fetchUserDetails(this.value)">
+        <option value="">Select User</option>
+        {% for user in users %}
+            <option value="{{ user.id }}">{{ user.name }}</option>
+        {% endfor %}
+    </select>
+    <form action="/admin/edit_user" method="POST">
+        <input type="hidden" id="user_id" name="id" required><br>
+        Name: <input type="text" id="name" name="name"><br>
+        Email: <input type="email" id="email" name="email"><br>
+        Phone: <input type="text" id="phone" name="phone"><br>
+        Address: <input type="text" id="address" name="address"><br>
+        Location: <input type="text" id="location" name="location">
+        <button type="button" onclick="getCurrentLocation()">Use Current Location</button><br>
+        <input type="submit" value="Submit">
+        <button type="button" onclick="if(confirmDeletion()) document.getElementById('delete_form').submit();">Delete User</button>
+    </form>
+
+    <!-- Hidden form for deletion -->
+    <form id="delete_form" action="/admin/delete_user" method="POST" style="display:none;">
+        <input type="hidden" id="delete_user_name" name="name">
+    </form>
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+</body>
+</html>
